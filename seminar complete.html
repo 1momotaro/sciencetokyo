@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Useful English · Science Tokyo</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #1A2E5A; --teal: #028090; --mint: #02C39A;
+    --white: #FFFFFF; --off: #F6F8FA; --slate: #4A5568;
+    --border: #E2E8F0; --red: #C53030; --red-soft: #FFF0F0;
+    --green: #276749; --green-soft: #F0FFF4; --gold: #D97706;
+  }
+
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--navy); }
+
+  /* ── APP SHELL ── */
+  #app { display: flex; height: 100vh; height: 100dvh; flex-direction: column; }
+
+  /* HEADER */
+  .app-header {
+    background: var(--navy); padding: 0.6rem 1rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .app-badge { background: var(--mint); color: var(--navy); font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; letter-spacing: 0.05em; white-space: nowrap; }
+  .app-title { color: #AECBD8; font-size: 0.78rem; font-weight: 400; display: none; flex: 1; }
+  @media (min-width: 480px) { .app-title { display: block; } }
+
+  /* Activities button in header */
+  .btn-activities {
+    background: var(--gold); color: var(--white); border: none;
+    padding: 0.4rem 0.85rem; border-radius: 6px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 700;
+    cursor: pointer; white-space: nowrap; transition: opacity 0.2s;
+    display: flex; align-items: center; gap: 0.35rem;
+  }
+  .btn-activities:hover { opacity: 0.88; }
+
+  .progress-wrap { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+  .prog-label { font-size: 0.72rem; color: #AECBD8; white-space: nowrap; }
+  .prog-track { width: 55px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--mint); border-radius: 2px; transition: width 0.4s ease; }
+
+  /* ── STAGE ── */
+  .stage { flex: 1; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+
+  /* SLIDES */
+  .slide { display: none; flex: 1; overflow-y: auto; padding: 1.25rem 1.1rem 0.75rem; background: var(--off); flex-direction: column; }
+  .slide.active { display: flex; animation: fadeUp 0.22s ease; }
+  @media (min-width: 600px) { .slide { padding: 1.75rem 2rem 1rem; } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Title slide */
+  .slide-title { background: var(--navy); justify-content: center; }
+  .slide-title .s-tag { display: inline-block; background: var(--mint); color: var(--navy); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.22rem 0.55rem; border-radius: 4px; margin-bottom: 0.85rem; }
+  .slide-title h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.7rem,5vw,2.8rem); color: var(--white); line-height: 1.2; margin-bottom: 0.85rem; }
+  .slide-title p { color: #AECBD8; font-size: 0.9rem; line-height: 1.7; max-width: 540px; }
+
+  /* Divider slide */
+  .slide-divider { background: var(--teal); justify-content: center; }
+  .slide-divider .part-label { color: rgba(255,255,255,0.65); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.65rem; }
+  .slide-divider h2 { font-family: 'DM Serif Display', serif; font-size: clamp(1.7rem,5vw,2.6rem); color: var(--white); line-height: 1.2; margin-bottom: 0.85rem; }
+  .slide-divider p { color: rgba(255,255,255,0.78); font-size: 0.9rem; line-height: 1.65; max-width: 480px; }
+
+  /* Content slide */
+  .slide-content { background: var(--off); }
+  .slide-content h2 { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem,4.5vw,2.6rem); color: var(--navy); margin-bottom: 1.1rem; line-height: 1.3; }
+
+  /* Activities slide */
+  .slide-activities { background: var(--white); }
+  .slide-activities h2 { font-family: 'DM Serif Display', serif; font-size: clamp(1.4rem,3.5vw,2rem); color: var(--navy); margin-bottom: 0.35rem; }
+  .activities-sub { font-size: 0.95rem; color: var(--slate); margin-bottom: 1.1rem; }
+  .btn-return {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: var(--navy); color: var(--white); border: none;
+    padding: 0.5rem 1rem; border-radius: 6px;
+    font-family: 'DM Sans',sans-serif; font-size: 0.8rem; font-weight: 600;
+    cursor: pointer; margin-bottom: 1.1rem; transition: background 0.18s;
+  }
+  .btn-return:hover { background: var(--teal); }
+
+  /* Activity group */
+  .act-group { margin-bottom: 1.1rem; }
+  .act-group-header {
+    background: var(--navy); color: var(--white);
+    padding: 0.45rem 0.85rem; border-radius: 7px 7px 0 0;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .act-group-header .part-tag { color: var(--mint); font-size: 0.68rem; }
+
+  /* Individual activity card */
+  .act-card {
+    background: var(--off); border: 1px solid var(--border);
+    border-top: none; padding: 0;
+    transition: all 0.2s;
+  }
+  .act-card:last-child { border-radius: 0 0 7px 7px; }
+  .act-card-header {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.7rem 0.85rem; cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    user-select: none;
+  }
+  .act-card-header:hover { background: rgba(2,128,144,0.04); }
+  .act-status { width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; flex-shrink: 0; transition: all 0.2s; }
+  .act-status.done { background: var(--mint); color: var(--navy); }
+  .act-info { flex: 1; }
+  .act-title { font-size: 0.85rem; font-weight: 600; color: var(--navy); }
+  .act-desc { font-size: 0.75rem; color: var(--slate); margin-top: 0.1rem; }
+  .act-type { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.15rem 0.4rem; border-radius: 3px; flex-shrink: 0; }
+  .act-type.mc { background: rgba(2,128,144,0.1); color: var(--teal); }
+  .act-type.reveal { background: rgba(217,119,6,0.1); color: var(--gold); }
+  .act-type.quiz { background: rgba(26,46,90,0.1); color: var(--navy); }
+  .act-chevron { font-size: 0.8rem; color: var(--slate); transition: transform 0.2s; flex-shrink: 0; }
+  .act-card.open .act-chevron { transform: rotate(90deg); }
+  .act-body { display: none; padding: 1rem 0.85rem; border-bottom: 1px solid var(--border); }
+  .act-card.open .act-body { display: block; animation: fadeUp 0.2s ease; }
+
+  /* ── CONTENT COMPONENTS ── */
+  .card-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(165px,1fr)); gap: 0.75rem; margin-bottom: 1.1rem; }
+  .info-card { background: var(--white); border-radius: 9px; padding: 1rem; box-shadow: 0 2px 10px rgba(26,46,90,0.07); border-top: 3px solid var(--teal); }
+  .info-card .ic-icon { font-size: 1.5rem; margin-bottom: 0.35rem; }
+  .info-card h4 { font-size: 1.05rem; font-weight: 600; color: var(--navy); margin-bottom: 0.25rem; }
+  .info-card p { font-size: 1.08rem; color: var(--slate); line-height: 1.5; }
+
+  .gap-list { display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 1.1rem; }
+  .gap-item { display: flex; gap: 0.75rem; align-items: flex-start; background: var(--white); border-radius: 8px; padding: 0.75rem 0.9rem; box-shadow: 0 1px 6px rgba(26,46,90,0.06); }
+  .gap-num { background: var(--teal); color: var(--white); width: 1.7rem; height: 1.7rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 700; flex-shrink: 0; }
+  .gap-num.red { background: var(--red); }
+  .gap-body strong { display: block; font-size: 1.15rem; color: var(--navy); margin-bottom: 0.12rem; }
+  .gap-fix { font-size: 1.05rem; color: var(--teal); font-style: italic; }
+
+  .ba-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.9rem; }
+  @media (max-width: 480px) { .ba-row { grid-template-columns: 1fr; } }
+  .ba-box { border-radius: 8px; padding: 0.9rem; border: 1.5px solid; }
+  .ba-box.before { background: var(--red-soft); border-color: #FC8181; }
+  .ba-box.after { background: var(--green-soft); border-color: #68D391; }
+  .ba-tag { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.12rem 0.4rem; border-radius: 3px; margin-bottom: 0.45rem; }
+  .ba-box.before .ba-tag { background: var(--red); color: var(--white); }
+  .ba-box.after .ba-tag { background: var(--green); color: var(--white); }
+  .ba-box p { font-size: 1.08rem; line-height: 1.5; }
+  .ba-box.before p { color: #742A2A; }
+  .ba-box.after p { color: #22543D; }
+
+  .dialogue { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 1.1rem; }
+  .dl { display: flex; gap: 0.55rem; align-items: flex-start; }
+  .dl.staff { flex-direction: row-reverse; }
+  .dl-tag { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.12rem 0.38rem; border-radius: 3px; white-space: nowrap; flex-shrink: 0; margin-top: 0.12rem; }
+  .dl.student .dl-tag { background: #EBF4FF; color: #2B6CB0; }
+  .dl.staff .dl-tag { background: rgba(2,128,144,0.12); color: var(--teal); }
+  .bubble { background: var(--white); border: 1px solid var(--border); border-radius: 9px; padding: 0.55rem 0.8rem; font-size: 1.08rem; color: var(--slate); max-width: calc(100% - 75px); line-height: 1.5; }
+  .dl.staff .bubble { background: rgba(2,195,154,0.08); border-color: rgba(2,128,144,0.2); }
+
+  .soft-table { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 1.1rem; }
+  .soft-row { display: flex; border-radius: 7px; overflow: hidden; box-shadow: 0 1px 5px rgba(26,46,90,0.07); }
+  .soft-lbl { background: var(--navy); color: var(--white); padding: 0.6rem 0.8rem; font-size: 1rem; font-weight: 600; width: 135px; flex-shrink: 0; display: flex; align-items: center; }
+  @media (max-width: 400px) { .soft-lbl { width: 100px; font-size: 0.9rem; } }
+  .soft-ex { background: var(--white); padding: 0.6rem 0.8rem; font-size: 1.05rem; color: var(--slate); font-style: italic; flex: 1; border: 1px solid var(--border); border-left: none; display: flex; align-items: center; }
+
+  .sig-table { border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(26,46,90,0.07); margin-bottom: 1.1rem; }
+  .sig-head { display: grid; grid-template-columns: 1fr 1fr; }
+  .sig-head div { padding: 0.5rem 0.8rem; font-size: 0.88rem; font-weight: 700; color: var(--white); }
+  .sig-head div:first-child { background: var(--navy); }
+  .sig-head div:last-child { background: var(--teal); }
+  .sig-row { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border); }
+  .sig-row:last-child { border-bottom: none; }
+  .sig-row:nth-child(odd) { background: var(--off); }
+  .sig-row:nth-child(even) { background: var(--white); }
+  .sig-row div { padding: 0.6rem 0.8rem; font-size: 1.05rem; }
+  .sig-row div:first-child { color: var(--navy); }
+  .sig-row div:last-child { color: var(--teal); font-style: italic; }
+
+  .scenario { background: var(--white); border-radius: 8px; box-shadow: 0 1px 6px rgba(26,46,90,0.07); overflow: hidden; margin-bottom: 0.75rem; }
+  .scen-sit { background: rgba(217,119,6,0.1); border-left: 3px solid var(--gold); padding: 0.6rem 0.9rem; font-size: 1.05rem; color: #92400E; font-weight: 500; }
+  .scen-resp { padding: 0.75rem 0.9rem; font-size: 1.08rem; color: var(--slate); font-style: italic; line-height: 1.6; }
+
+  .key-card { background: var(--navy); border-radius: 9px; padding: 1.1rem; margin-bottom: 1.1rem; }
+  .key-card h3 { font-family: 'DM Serif Display',serif; color: var(--mint); font-size: 1.3rem; margin-bottom: 0.4rem; }
+  .key-card p { color: #AECBD8; font-size: 1.1rem; line-height: 1.65; }
+
+  .reflection { display: flex; gap: 0.75rem; background: rgba(217,119,6,0.08); border: 1.5px solid rgba(217,119,6,0.22); border-radius: 8px; padding: 0.9rem; margin-bottom: 1.1rem; }
+  .refl-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .refl-body strong { display: block; color: var(--gold); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.25rem; }
+  .refl-body p { font-size: 1.08rem; color: var(--slate); line-height: 1.5; }
+
+  .ref-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 0.65rem; margin-bottom: 1.1rem; }
+  .ref-card { background: var(--white); border-radius: 8px; box-shadow: 0 1px 6px rgba(26,46,90,0.07); overflow: hidden; }
+  .ref-head { padding: 0.45rem 0.8rem; font-size: 0.88rem; font-weight: 700; color: var(--white); }
+  .ref-head.teal { background: var(--teal); }
+  .ref-head.navy { background: var(--navy); }
+  .ref-card ul { list-style: none; padding: 0.6rem 0.8rem; }
+  .ref-card ul li { font-size: 1.00rem; color: var(--slate); padding: 0.22rem 0; border-bottom: 1px solid var(--border); }
+  .ref-card ul li::before { content: "› "; color: var(--teal); font-weight: 700; }
+  .ref-card ul li:last-child { border-bottom: none; }
+
+  .phrase-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(155px,1fr)); gap: 0.65rem; margin-bottom: 1.1rem; }
+  .phrase-col { background: var(--white); border-radius: 8px; box-shadow: 0 1px 6px rgba(26,46,90,0.07); overflow: hidden; }
+  .phrase-head { background: var(--teal); color: var(--white); padding: 0.45rem 0.8rem; font-size: 0.88rem; font-weight: 600; }
+  .phrase-col ul { list-style: none; padding: 0.6rem 0.8rem; }
+  .phrase-col ul li { font-size: 1.02rem; color: var(--slate); padding: 0.25rem 0; border-bottom: 1px solid var(--border); font-style: italic; }
+  .phrase-col ul li:last-child { border-bottom: none; }
+
+  /* ── EXERCISE COMPONENTS ── */
+  .ex-type-tag { display: inline-block; background: rgba(2,128,144,0.1); color: var(--teal); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.15rem 0.45rem; border-radius: 3px; margin-bottom: 0.6rem; }
+  .ex-q { font-size: 1rem; font-weight: 600; color: var(--navy); margin-bottom: 0.75rem; line-height: 1.5; }
+  .ex-stem { font-style: italic; color: var(--slate); margin-bottom: 0.75rem; font-size: 0.95rem; line-height: 1.55; }
+
+  .mc-opts { display: flex; flex-direction: column; gap: 0.45rem; }
+  .mc-opt { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.7rem 0.85rem; border-radius: 7px; border: 1.5px solid var(--border); cursor: pointer; transition: all 0.15s; background: var(--off); font-size: 1.05rem; color: var(--slate); line-height: 1.45; }
+  .mc-opt:hover:not(.done) { border-color: var(--teal); background: rgba(2,128,144,0.04); }
+  .mc-opt.correct { border-color: var(--green); background: var(--green-soft); color: #22543D; }
+  .mc-opt.wrong { border-color: var(--red); background: var(--red-soft); color: #742A2A; }
+  .mc-opt.done { cursor: default; }
+  .mc-letter { background: var(--border); color: var(--slate); width: 1.4rem; height: 1.4rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; flex-shrink: 0; }
+  .mc-opt.correct .mc-letter { background: var(--green); color: var(--white); }
+  .mc-opt.wrong .mc-letter { background: var(--red); color: var(--white); }
+  .mc-fb { margin-top: 0.6rem; font-size: 0.81rem; padding: 0.55rem 0.8rem; border-radius: 6px; display: none; line-height: 1.5; }
+  .mc-fb.show { display: block; }
+  .mc-fb.good { background: var(--green-soft); color: #276749; border-left: 3px solid var(--green); }
+  .mc-fb.bad { background: var(--red-soft); color: var(--red); border-left: 3px solid var(--red); }
+
+  .reveal-btn { background: var(--off); border: 1.5px dashed var(--teal); border-radius: 7px; padding: 0.8rem; text-align: center; cursor: pointer; font-size: 0.83rem; color: var(--teal); font-weight: 500; transition: background 0.15s; }
+  .reveal-btn:hover { background: rgba(2,128,144,0.05); }
+  .reveal-ans { display: none; background: var(--green-soft); border: 1.5px solid #68D391; border-radius: 7px; padding: 0.85rem; font-size: 0.83rem; color: #22543D; line-height: 1.6; animation: fadeUp 0.22s ease; }
+  .reveal-ans.show { display: block; }
+  .reveal-note { font-size: 0.73rem; color: #276749; margin-top: 0.35rem; font-style: italic; }
+
+  /* Quiz in activities panel */
+  .quiz-q { margin-bottom: 0.85rem; }
+  .quiz-qn { font-size: 0.68rem; font-weight: 700; color: var(--teal); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .quiz-q h4 { font-size: 0.86rem; font-weight: 600; color: var(--navy); margin-bottom: 0.65rem; line-height: 1.5; }
+  .quiz-stem { font-size: 0.8rem; color: var(--slate); font-style: italic; margin-bottom: 0.65rem; background: var(--off); padding: 0.45rem 0.7rem; border-radius: 5px; line-height: 1.5; }
+  .quiz-result { display: none; margin-top: 1.25rem; padding: 1.5rem; border-radius: 10px; text-align: center; }
+  .quiz-result.show { display: block; animation: fadeUp 0.25s ease; }
+  .quiz-result.ex { background: var(--green-soft); border: 2px solid #68D391; }
+  .quiz-result.gd { background: #FFFBEB; border: 2px solid #FCD34D; }
+  .quiz-result.kg { background: var(--red-soft); border: 2px solid #FC8181; }
+  .q-score { font-family: 'DM Serif Display',serif; font-size: 2.5rem; margin-bottom: 0.35rem; }
+  .quiz-result.ex .q-score { color: var(--green); }
+  .quiz-result.gd .q-score { color: var(--gold); }
+  .quiz-result.kg .q-score { color: var(--red); }
+  .q-msg { font-size: 0.95rem; font-weight: 600; color: var(--navy); margin-bottom: 0.25rem; }
+  .q-sub { font-size: 0.82rem; color: var(--slate); line-height: 1.5; }
+  .btn-submit { background: var(--mint); color: var(--navy); border: none; padding: 0.75rem 1.5rem; border-radius: 7px; font-family: 'DM Sans',sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; margin-top: 1rem; width: 100%; transition: opacity 0.2s; }
+  .btn-submit:hover { opacity: 0.9; }
+  .btn-submit:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ── FOOTER NAV ── */
+  .slide-footer {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+    background: var(--white); border-top: 1px solid var(--border);
+    padding: 0.55rem 1rem; padding-bottom: calc(0.55rem + env(safe-area-inset-bottom));
+    display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+  }
+  .stage { padding-bottom: 60px; }
+  .btn-slide { display: flex; align-items: center; gap: 0.35rem; padding: 0.55rem 1rem; border-radius: 7px; font-family: 'DM Sans',sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; }
+  .btn-prev { background: var(--off); color: var(--slate); border: 1.5px solid var(--border); }
+  .btn-prev:hover:not(:disabled) { border-color: var(--navy); color: var(--navy); }
+  .btn-nxt { background: var(--navy); color: var(--white); }
+  .btn-nxt:hover:not(:disabled) { background: var(--teal); }
+  .btn-slide:disabled { opacity: 0.3; cursor: not-allowed; }
+  .slide-counter { font-size: 0.75rem; color: var(--slate); text-align: center; line-height: 1.4; }
+  .slide-section-name { font-size: 0.65rem; color: #AECBD8; }
+
+
+  .slide-activity-prompt {
+    background: linear-gradient(135deg, #1A2E5A 0%, #028090 100%);
+    justify-content: center; align-items: center; text-align: center; gap: 0.75rem;
+  }
+  .ap-icon { font-size: 3rem; }
+  .ap-part { color: rgba(255,255,255,0.65); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+  .ap-heading { font-family: "DM Serif Display", serif; font-size: clamp(1.5rem,4vw,2.2rem); color: var(--white); line-height: 1.2; }
+  .ap-label { color: var(--mint); font-size: 0.92rem; font-weight: 500; max-width: 320px; line-height: 1.5; }
+  .ap-instruction { color: rgba(255,255,255,0.75); font-size: 0.85rem; line-height: 1.6; max-width: 280px; }
+  .ap-instruction strong { color: var(--white); }
+  .btn-go-activities {
+    background: var(--mint); color: var(--navy); border: none;
+    padding: 0.7rem 1.5rem; border-radius: 8px;
+    font-family: "DM Sans", sans-serif; font-weight: 700; font-size: 0.9rem;
+    cursor: pointer; transition: opacity 0.2s; margin-top: 0.5rem;
+  }
+  .btn-go-activities:hover { opacity: 0.88; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="app-header">
+    <div style="display:flex;align-items:center;gap:0.55rem;min-width:0">
+      <span class="app-badge">Science Tokyo</span>
+      <span class="app-title">Useful English for Supporting International Students</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.65rem;flex-shrink:0">
+      <button class="btn-activities" onclick="goActivities()">📝 Activities</button>
+      <div class="progress-wrap">
+        <span class="prog-label" id="prog-lbl">1/29</span>
+        <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage">
+
+    <!-- s-0: Title -->
+    <div class="slide slide-title active" id="s-0">
+      <span class="s-tag">Science Tokyo FD Seminar · 2026</span>
+      <h1>Useful English Expressions for Supporting International Students</h1>
+      <p>Welcome. With a growing international community, effective English communication is more important than ever.<br><br>Use the <strong style="color:var(--mint)">← →</strong> buttons to move through the slides. Tap <strong style="color:var(--gold)">📝 Activities</strong> at any time to open the exercises.</p>
+    </div>
+
+    <!-- s-presenter: About the Presenter -->
+    <div class="slide slide-content" id="s-1">
+      <h2>About Your Instructor</h2>
+      <div class="key-card" style="margin-bottom:1.1rem">
+        <h3>Ronald Schmidt-Fajlik</h3>
+        <p>Associate Professor, Ibaraki University, Japan &nbsp;·&nbsp; 🇨🇦 Originally from Canada</p>
+        <p style="margin-top:0.6rem">Questions or comments during your self-access period? ✉️ <a href="mailto:rschmidtfajlik@yahoo.com" style="color:var(--mint)">rschmidtfajlik@yahoo.com</a></p>
+      </div>
+      <div class="card-row">
+        <div class="info-card" style="border-top-color:var(--teal)">
+          <div class="ic-icon">🌐</div>
+          <h4>Intercultural Communication</h4>
+          <p>Research into how cultural background shapes communication — and how awareness bridges the gap.</p>
+        </div>
+        <div class="info-card" style="border-top-color:var(--navy)">
+          <div class="ic-icon">📚</div>
+          <h4>English Language Teaching &amp; Pedagogy</h4>
+          <p>Practical approaches to language instruction, educational design, and learner-centred teaching.</p>
+        </div>
+        <div class="info-card" style="border-top-color:var(--mint)">
+          <div class="ic-icon">🎓</div>
+          <h4>Educational Philosophy</h4>
+          <p>How we think about learning, communication, and inclusion shapes what we do in the classroom — and beyond it.</p>
+        </div>
+      </div>
+      <div class="reflection">
+        <div class="refl-icon">💭</div>
+        <div class="refl-body">
+          <strong>A note on today</strong>
+          <p>Today's session draws on research in intercultural communication and language pedagogy to offer practical tools you can use immediately in your interactions with international students at Science Tokyo.</p>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- s-2: Session Outline -->
+    <div class="slide slide-content" id="s-2">
+      <h2>Session Outline</h2>
+      <div class="gap-list">
+        <div class="gap-item">
+          <div class="gap-num" style="background:var(--teal)">1</div>
+          <div class="gap-body">
+            <strong>The International Student Landscape</strong>
+            <span class="gap-fix">Japan's growing international student numbers and the communication gap</span>
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-num" style="background:var(--teal)">2</div>
+          <div class="gap-body">
+            <strong>Understanding the Cultural Context</strong>
+            <span class="gap-fix">Different communication cultures and common friction points</span>
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-num" style="background:var(--teal)">3</div>
+          <div class="gap-body">
+            <strong>Common Communication Gaps</strong>
+            <span class="gap-fix">The top 5 gaps and before &amp; after examples</span>
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-num" style="background:var(--teal)">4</div>
+          <div class="gap-body">
+            <strong>Counter &amp; Procedure Language</strong>
+            <span class="gap-fix">Essential phrases, sample dialogues, and practice activities</span>
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-num" style="background:var(--teal)">5</div>
+          <div class="gap-body">
+            <strong>Rules, Requests &amp; Saying No Softly</strong>
+            <span class="gap-fix">The softening toolkit and the CARE formula</span>
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-num" style="background:var(--teal)">6</div>
+          <div class="gap-body">
+            <strong>Supporting Students &amp; Written Communication</strong>
+            <span class="gap-fix">Reading the signs, rephrasing strategies, and email best practices</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- s-3: Research slide 1 — The Numbers -->
+    <div class="slide slide-content" id="s-3">
+      <h2>Japan's International Student Boom</h2>
+      <div class="card-row">
+        <div class="info-card" style="border-top-color:var(--mint)">
+          <div class="ic-icon">📊</div>
+          <h4>336,708 in 2024</h4>
+          <p>A record high — a 20.6% increase in a single year, according to JASSO's Annual International Student Survey (2024).</p>
+        </div>
+        <div class="info-card" style="border-top-color:var(--teal)">
+          <div class="ic-icon">🚀</div>
+          <h4>435,000 by June 2025</h4>
+          <p>Japan hit its government target of 400,000 students by 2033 — eight years ahead of schedule. (Japan Immigration Services Agency, 2025)</p>
+        </div>
+        <div class="info-card" style="border-top-color:var(--navy)">
+          <div class="ic-icon">🎯</div>
+          <h4>Growing Ambition</h4>
+          <p>Japan's government is now expanding enrolment limits at top universities and removing caps on international student tuition to accelerate further growth.</p>
+        </div>
+      </div>
+      <div class="key-card">
+        <h3>What this means for Science Tokyo</h3>
+        <p>With international student numbers growing rapidly across Japan, Science Tokyo — as a flagship merged institution — sits at the centre of this shift. Every member of staff is now, in effect, an international student support professional.</p>
+      </div>
+    </div>
+
+    <!-- s-5: Research slide 2 — The Communication Gap -->
+    <div class="slide slide-content" id="s-4">
+      <h2>The Communication Gap — What Research Tells Us</h2>
+      <div class="gap-list">
+        <div class="gap-item">
+          <div class="gap-num red">!</div>
+          <div class="gap-body">
+            <strong>Staff English proficiency is a documented barrier</strong>
+            <span class="gap-fix">Research indicates most Japanese university staff may not be capable of communicating effectively with international students who rely on English. (Rees, London Review of Education, 2024)</span>
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-num red">!</div>
+          <div class="gap-body">
+            <strong>Japan ranks 92nd out of 116 countries for English proficiency</strong>
+            <span class="gap-fix">A record low — meaning the gap between international student expectations and staff capability is real and growing. (EF English Proficiency Index, cited in Saito, 2024)</span>
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-num red">!</div>
+          <div class="gap-body">
+            <strong>International students report significant communication challenges</strong>
+            <span class="gap-fix">Studies in Japanese universities show students struggle not just with lectures, but with everyday admin interactions — accessing services, understanding procedures, getting help. (Journal of International Students, 2017)</span>
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-num red">!</div>
+          <div class="gap-body">
+            <strong>Japanese language is cited as an "organisational barrier"</strong>
+            <span class="gap-fix">International students in English-medium programmes report that International students in English-medium programmes report that Japanese-only administrative services create stress and a sense of exclusion. (Rees, 2024)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- s-3: Research slide 3 — Belonging -->
+    <div class="slide slide-content" id="s-5">
+      <h2>Why Belonging Matters — The Research Case</h2>
+      <div class="card-row">
+        <div class="info-card" style="border-top-color:var(--teal)">
+          <div class="ic-icon">🧠</div>
+          <h4>Belonging Drives Performance</h4>
+          <p>Research consistently shows that students who feel a sense of belonging perform better academically, persist longer, and report higher wellbeing — and that this is especially true for international students. (Rees, 2024)</p>
+        </div>
+        <div class="info-card" style="border-top-color:var(--navy)">
+          <div class="ic-icon">💬</div>
+          <h4>Staff Interactions Are Critical</h4>
+          <p>For international students, interactions with non-teaching staff — at counters, offices, and corridors — are among the most frequent contact points with the institution. How those interactions go shapes belonging.</p>
+        </div>
+        <div class="info-card" style="border-top-color:var(--mint)">
+          <div class="ic-icon">🌱</div>
+          <h4>Small Moments, Big Impact</h4>
+          <p>Research on internationalisation success identifies belonging as a key indicator — and belonging begins with feeling understood and supported in everyday interactions. (Rees, 2024)</p>
+        </div>
+      </div>
+      <div class="key-card">
+        <h3>The bottom line</h3>
+        <p>You do not need to be a language teacher to make a difference. Clear, kind, supportive English in everyday interactions directly supports student wellbeing, academic success, and Science Tokyo's international reputation.</p>
+      </div>
+    </div>
+
+    <!-- s-4: Why it matters -->
+    <div class="slide slide-content" id="s-6">
+      <h2>Why This Matters</h2>
+      <div class="card-row">
+        <div class="info-card"><div class="ic-icon">🎓</div><h4>World-Class Research</h4><p>Science Tokyo unites science, engineering, medicine and dental sciences — drawing students from across the globe.</p></div>
+        <div class="info-card"><div class="ic-icon">🌏</div><h4>Growing International Community</h4><p>With international enrolment increasing year on year, inclusive communication supports Science Tokyo's mission.</p></div>
+        <div class="info-card"><div class="ic-icon">🤝</div><h4>Every Interaction Counts</h4><p>Clear, courteous, supportive English helps international students feel confident and welcome on campus.</p></div>
+      </div>
+      <div class="reflection"><div class="refl-icon">💭</div><div class="refl-body"><strong>Reflection</strong><p>Think of a recent interaction with an international student. What worked well? What could have been clearer?</p></div></div>
+    </div>
+
+    <!-- s-2: What good looks like -->
+    <div class="slide slide-content" id="s-7">
+      <h2>What Good Communication Looks Like</h2>
+      <div class="card-row">
+        <div class="info-card"><div class="ic-icon">🔊</div><h4>Clear</h4><p>Simple sentences. No jargon or contractions. A measured pace. Say "do not" not "don't."</p></div>
+        <div class="info-card"><div class="ic-icon">😊</div><h4>Friendly</h4><p>Smile. Use their name. Acknowledge their effort to communicate in a foreign language.</p></div>
+        <div class="info-card"><div class="ic-icon">🤝</div><h4>Supportive</h4><p>Offer options, not dead ends. Normalise asking again. End every interaction positively.</p></div>
+      </div>
+    </div>
+
+    <!-- s-3: Cultural divider -->
+    <div class="slide slide-divider" id="s-8">
+      <div class="part-label">Part 1</div>
+      <h2>Understanding the Cultural Context</h2>
+      <p>Before specific phrases, it helps to understand why communication with international students can be challenging — and what creates misunderstandings.</p>
+    </div>
+
+    <!-- s-4: Two cultures -->
+    <div class="slide slide-content" id="s-9">
+      <h2>Different Communication Cultures</h2>
+      <div class="card-row">
+        <div class="info-card" style="border-top-color:#C53030"><div class="ic-icon">🇯🇵</div><h4>Japanese Style</h4><p>Often indirect. Silence is comfortable. "Reading the room" is valued. Disagreement is rarely expressed openly.</p></div>
+        <div class="info-card" style="border-top-color:var(--teal)"><div class="ic-icon">🌍</div><h4>International Expectations</h4><p>Many expect direct answers. Silence may feel like rejection. They may ask the same question repeatedly or push back directly.</p></div>
+        <div class="info-card" style="border-top-color:var(--mint)"><div class="ic-icon">⚡</div><h4>Where Friction Happens</h4><p>The gap between these styles is where misunderstandings occur — not from bad intentions, but different assumptions.</p></div>
+      </div>
+    </div>
+
+    <!-- s-5: Friction points -->
+    <div class="slide slide-content" id="s-10">
+      <h2>Common Cultural Friction Points</h2>
+      <div class="gap-list">
+        <div class="gap-item"><div class="gap-num red">!</div><div class="gap-body"><strong>The polite "Yes" problem</strong><span class="gap-fix">→ Many students say "yes" to avoid embarrassment. Always verify with a specific check question.</span></div></div>
+        <div class="gap-item"><div class="gap-num red">!</div><div class="gap-body"><strong>Silence being misread</strong><span class="gap-fix">→ Staff silence may feel like coldness or disapproval to international students.</span></div></div>
+        <div class="gap-item"><div class="gap-num red">!</div><div class="gap-body"><strong>Indirect refusals causing confusion</strong><span class="gap-fix">→ "That may be difficult..." means "no" in Japan but "maybe" to many international students.</span></div></div>
+        <div class="gap-item"><div class="gap-num red">!</div><div class="gap-body"><strong>Emotional expression differences</strong><span class="gap-fix">→ A student who seems urgent or expressive is not being rude — this may be their normal style.</span></div></div>
+      </div>
+      <div class="key-card"><h3>Different is not wrong — it's just different</h3><p>International students are navigating an unfamiliar system in a foreign language, often under stress. Every clear, kind interaction supports Science Tokyo's mission.</p></div>
+    </div>
+
+
+    <div class="slide slide-content" id="s-11">
+      <h2>Gestures Aren't Universal Either</h2>
+      <div class="card-row">
+        <div class="info-card" style="border-top-color:var(--gold)"><div class="ic-icon">👌</div><h4>The "OK" Sign</h4><p>Vulgar or offensive in Brazil, and read negatively in parts of the Middle East and Germany.</p></div>
+        <div class="info-card" style="border-top-color:var(--teal)"><div class="ic-icon">👍</div><h4>Thumbs Up</h4><p>Considered offensive in parts of the Middle East, West Africa, and some Latin American countries.</p></div>
+        <div class="info-card" style="border-top-color:var(--mint)"><div class="ic-icon">🤷</div><h4>Head Wobble / Tilt</h4><p>In India, a side-to-side wobble often signals agreement — not "no" or uncertainty.</p></div>
+      </div>
+      <div class="key-card"><h3>When in doubt, ask</h3><p>Check what a gesture means before using it with someone new, rather than assuming it translates.</p></div>
+    </div>
+
+    <div class="slide slide-activity-prompt" id="s-12">
+      <div class="ap-icon">📝</div>
+      <div class="ap-part">Part 1 · Cultural Context</div>
+      <div class="ap-heading">Activity 1 &amp; Activity 2</div>
+      <div class="ap-label">Cultural Styles &amp; Indirect Refusals</div>
+      <div class="ap-instruction">Tap <strong>📝 Activities</strong> in the top bar,<br>then open <strong>Activity 1, Activity 2</strong></div>
+      <button class="btn-go-activities" onclick="goActivities()">Open Activities →</button>
+    </div>
+
+    <!-- s-7: Gaps divider -->
+    <div class="slide slide-divider" id="s-13">
+      <div class="part-label">Part 2</div>
+      <h2>Common Communication Gaps</h2>
+      <p>Small language habits create big misunderstandings. Here are the five most common gaps — and how to close them.</p>
+    </div>
+
+    <!-- s-8: Top 5 -->
+    <div class="slide slide-content" id="s-14">
+      <h2>The Top 5 Gaps</h2>
+      <div class="gap-list">
+        <div class="gap-item"><div class="gap-num">01</div><div class="gap-body"><strong>Assuming silence = understanding</strong><span class="gap-fix">→ Always check: "Does that make sense?"</span></div></div>
+        <div class="gap-item"><div class="gap-num">02</div><div class="gap-body"><strong>Using passive voice or bureaucratic phrases</strong><span class="gap-fix">→ "You need to..." becomes "Could you please..."</span></div></div>
+        <div class="gap-item"><div class="gap-num">03</div><div class="gap-body"><strong>Speaking too fast or using contractions</strong><span class="gap-fix">→ Slow down. Say "do not" not "don't"</span></div></div>
+        <div class="gap-item"><div class="gap-num">04</div><div class="gap-body"><strong>Saying "No" directly without explanation</strong><span class="gap-fix">→ Offer a reason + an alternative path</span></div></div>
+        <div class="gap-item"><div class="gap-num">05</div><div class="gap-body"><strong>Repeating the same words when not understood</strong><span class="gap-fix">→ Rephrase — don't just repeat louder</span></div></div>
+      </div>
+    </div>
+
+    <!-- s-9: Before/After -->
+    <div class="slide slide-content" id="s-15">
+      <h2>Before &amp; After</h2>
+      <div class="ba-row">
+        <div class="ba-box before"><span class="ba-tag">Before</span><p>"The deadline is the 30th. You have to submit it through the portal."</p></div>
+        <div class="ba-box after"><span class="ba-tag">After</span><p>"The deadline is June 30th. Could you please submit the form online? I can show you how."</p></div>
+      </div>
+      <div class="ba-row">
+        <div class="ba-box before"><span class="ba-tag">Before</span><p>"That's not possible."</p></div>
+        <div class="ba-box after"><span class="ba-tag">After</span><p>"I'm afraid that isn't available right now, but let me check what options we have for you."</p></div>
+      </div>
+    </div>
+
+
+    <div class="slide slide-content" id="s-16">
+      <h2>"Yes" Doesn't Always Mean Yes</h2>
+      <div class="key-card" style="margin-bottom:1.1rem"><h3>"You haven't submitted the form yet, have you?"</h3><p>Negative questions flip the logic of yes/no answers between languages.</p></div>
+      <div class="ba-row">
+        <div class="ba-box after" style="background:var(--white);border-color:var(--border)">
+          <span class="ba-tag" style="background:var(--navy)">Not Submitted</span>
+          <p style="color:var(--slate);margin-top:0.5rem">English: "No, I haven't."</p>
+          <p style="color:var(--teal);font-style:italic;margin-top:0.35rem">Japanese: "Hai" (Yes) — correct, not submitted</p>
+        </div>
+        <div class="ba-box after" style="background:var(--white);border-color:var(--border)">
+          <span class="ba-tag" style="background:var(--teal)">Already Submitted</span>
+          <p style="color:var(--slate);margin-top:0.5rem">English: "Yes, I have."</p>
+          <p style="color:var(--teal);font-style:italic;margin-top:0.35rem">Japanese: "Iie" (No) — incorrect, I have submitted</p>
+        </div>
+      </div>
+      <div class="key-card"><h3>Avoid the ambiguity</h3><p>Confirm with a direct statement — "OK, so it's not submitted yet?"</p></div>
+    </div>
+
+    <div class="slide slide-activity-prompt" id="s-17">
+      <div class="ap-icon">📝</div>
+      <div class="ap-part">Part 2 · Communication Gaps</div>
+      <div class="ap-heading">Activity 3 &amp; Activity 4</div>
+      <div class="ap-label">Checking Understanding &amp; Broken English</div>
+      <div class="ap-instruction">Tap <strong>📝 Activities</strong> in the top bar,<br>then open <strong>Activity 3, Activity 4</strong></div>
+      <button class="btn-go-activities" onclick="goActivities()">Open Activities →</button>
+    </div>
+
+    <!-- s-11: Counter divider -->
+    <div class="slide slide-divider" id="s-18">
+      <div class="part-label">Part 3</div>
+      <h2>Counter &amp; Procedure Language</h2>
+      <p>At the service counter, clear step-by-step language reduces confusion and builds trust.</p>
+    </div>
+
+    <!-- s-12: Phrases -->
+    <div class="slide slide-content" id="s-19">
+      <h2>Essential Phrases</h2>
+      <div class="phrase-grid">
+        <div class="phrase-col"><div class="phrase-head">Opening</div><ul><li>"How can I help you today?"</li><li>"Could I have your student ID?"</li><li>"What is this regarding?"</li></ul></div>
+        <div class="phrase-col"><div class="phrase-head">Explaining Steps</div><ul><li>"First, you will need to..."</li><li>"After that, please..."</li><li>"The final step is to..."</li></ul></div>
+        <div class="phrase-col"><div class="phrase-head">Checking In</div><ul><li>"Does that make sense?"</li><li>"Would you like me to write that?"</li><li>"Shall I show you on the map?"</li></ul></div>
+      </div>
+    </div>
+
+    <!-- s-13: Dialogue 1 -->
+    <div class="slide slide-content" id="s-20">
+      <h2>Sample Dialogue: Certificate Request</h2>
+      <div class="dialogue">
+        <div class="dl student"><span class="dl-tag">Student</span><div class="bubble">Excuse me. I need... enrollment certificate. For visa.</div></div>
+        <div class="dl staff"><span class="dl-tag">Staff</span><div class="bubble">Of course! Could I have your student ID card, please?</div></div>
+        <div class="dl student"><span class="dl-tag">Student</span><div class="bubble"><em>(hands over card)</em></div></div>
+        <div class="dl staff"><span class="dl-tag">Staff</span><div class="bubble">Thank you. There are two steps. First, fill in this form. Second, come back in three business days. Does that make sense?</div></div>
+        <div class="dl student"><span class="dl-tag">Student</span><div class="bubble">Three days? OK...</div></div>
+        <div class="dl staff"><span class="dl-tag">Staff</span><div class="bubble">Yes — three working days. Would you like me to write the collection date on this slip for you?</div></div>
+      </div>
+    </div>
+
+    <!-- s-14: Dialogue 2 -->
+    <div class="slide slide-content" id="s-21">
+      <h2>Sample Dialogue: Lost on Campus</h2>
+      <div class="dialogue">
+        <div class="dl student"><span class="dl-tag">Student</span><div class="bubble">Sorry... International Office? Where?</div></div>
+        <div class="dl staff"><span class="dl-tag">Staff</span><div class="bubble">Of course! It's in Building 3. Go straight — then turn left. Second floor. Room 201.</div></div>
+        <div class="dl student"><span class="dl-tag">Student</span><div class="bubble">Building 3... second floor?</div></div>
+        <div class="dl staff"><span class="dl-tag">Staff</span><div class="bubble">Yes, exactly. Shall I draw a quick map for you?</div></div>
+        <div class="dl student"><span class="dl-tag">Student</span><div class="bubble">Yes please! Thank you.</div></div>
+      </div>
+    </div>
+
+    <div class="slide slide-activity-prompt" id="s-22">
+      <div class="ap-icon">📝</div>
+      <div class="ap-part">Part 3 · Counter Language</div>
+      <div class="ap-heading">Activity 5</div>
+      <div class="ap-label">At the Counter</div>
+      <div class="ap-instruction">Tap <strong>📝 Activities</strong> in the top bar,<br>then open <strong>Activity 5</strong></div>
+      <button class="btn-go-activities" onclick="goActivities()">Open Activities →</button>
+    </div>
+
+    <!-- s-16: Rules divider -->
+    <div class="slide slide-divider" id="s-23">
+      <div class="part-label">Part 4</div>
+      <h2>Rules, Requests &amp; Saying No Softly</h2>
+      <p>Being firm and kind at the same time is a skill. These tools help you set limits without closing doors.</p>
+    </div>
+
+    <!-- s-17: Softening toolkit -->
+    <div class="slide slide-content" id="s-24">
+      <h2>The Softening Toolkit</h2>
+      <div class="soft-table">
+        <div class="soft-row"><div class="soft-lbl">Modal verbs</div><div class="soft-ex">"You must" → "You will need to" / "Could you please..."</div></div>
+        <div class="soft-row"><div class="soft-lbl">I'm afraid...</div><div class="soft-ex">"I'm afraid that isn't possible at the moment."</div></div>
+        <div class="soft-row"><div class="soft-lbl">Unfortunately</div><div class="soft-ex">"Unfortunately we cannot do that today, but..."</div></div>
+        <div class="soft-row"><div class="soft-lbl">Let me check</div><div class="soft-ex">"Let me check what I can do for you."</div></div>
+        <div class="soft-row"><div class="soft-lbl">No + Alternative</div><div class="soft-ex">"That form is only online. I can send you the link right now."</div></div>
+      </div>
+      <div class="key-card"><h3>The CARE Formula</h3><p>Context → Acknowledgment → Reason → Exit (alternative)<br><br>A "no" with a path forward is always better than a dead end.</p></div>
+    </div>
+
+    <!-- s-18: CARE scenarios -->
+    <div class="slide slide-content" id="s-25">
+      <h2>CARE Formula in Action</h2>
+      <div class="scenario"><div class="scen-sit">📋 Student asks for a same-day certificate</div><div class="scen-resp">"I understand you need it quickly. Unfortunately, certificates take three business days. Would it help if I gave you a letter confirming your enrolment? That is available today."</div></div>
+      <div class="scenario"><div class="scen-sit">📚 Student's progress is below the required standard</div><div class="scen-resp">"I would like to be honest with you about your progress — right now, you're not quite at the required level. Let's look at what's realistic between now and the deadline, and build a plan together. Would that help?"</div></div>
+      <div class="scenario"><div class="scen-sit">📅 Student asks to change course after deadline</div><div class="scen-resp">"I completely understand. Unfortunately, the deadline was last Friday. I would suggest emailing your supervisor — they may be able to help. Would you like their contact details?"</div></div>
+    </div>
+
+    <div class="slide slide-activity-prompt" id="s-26">
+      <div class="ap-icon">📝</div>
+      <div class="ap-part">Part 4 · Rules &amp; Requests</div>
+      <div class="ap-heading">Activity 6</div>
+      <div class="ap-label">Saying No Softly</div>
+      <div class="ap-instruction">Tap <strong>📝 Activities</strong> in the top bar,<br>then open <strong>Activity 6</strong></div>
+      <button class="btn-go-activities" onclick="goActivities()">Open Activities →</button>
+    </div>
+
+    <!-- s-20: Supporting divider -->
+    <div class="slide slide-divider" id="s-27">
+      <div class="part-label">Part 5</div>
+      <h2>Supporting Students Who Struggle to Express Themselves</h2>
+      <p>Sometimes a student knows what they need but cannot find the words. Creating a patient, safe space is itself a communication skill.</p>
+    </div>
+
+    <!-- s-21: Reading the signs -->
+    <div class="slide slide-content" id="s-28">
+      <h2>Reading the Signs</h2>
+      <div class="sig-table">
+        <div class="sig-head"><div>Signal</div><div>Your Response</div></div>
+        <div class="sig-row"><div>Long pause before answering</div><div>"Take your time — there's no rush."</div></div>
+        <div class="sig-row"><div>Repeating your question back</div><div>"Yes, exactly. Do you have it with you?"</div></div>
+        <div class="sig-row"><div>"Yes" to everything (politeness)</div><div>Ask a yes/no check: "So, is the form ready?"</div></div>
+        <div class="sig-row"><div>Showing phone / translation app</div><div>"Of course — please go ahead and translate."</div></div>
+        <div class="sig-row"><div>Looking confused or anxious</div><div>"It's okay, take your time." Slow down. Offer paper.</div></div>
+      </div>
+    </div>
+
+    <!-- s-22: Rephrasing -->
+    <div class="slide slide-content" id="s-29">
+      <h2>Rephrasing Without Repeating</h2>
+      <div class="scenario"><div class="scen-sit">Strategy: Use shorter sentences</div><div class="scen-resp"><span style="color:var(--red)">Instead of:</span> "You will need to submit the required documentation to the administrative office by the end of this month."<br><br><span style="color:var(--green)">Try:</span> "Please bring this form here. By March 31st."</div></div>
+      <div class="scenario"><div class="scen-sit">Strategy: Use numbers and gestures</div><div class="scen-resp"><span style="color:var(--red)">Instead of:</span> "Come back in a few days."<br><br><span style="color:var(--green)">Try:</span> "Come back on Thursday. That is three days. <em>(point to calendar)</em>"</div></div>
+      <div class="scenario"><div class="scen-sit">Strategy: Write it down</div><div class="scen-resp"><span style="color:var(--red)">Instead of:</span> Repeating the same sentence.<br><br><span style="color:var(--green)">Try:</span> "Let me write this for you." <em>(writes key info on a slip)</em></div></div>
+    </div>
+
+
+    <div class="slide slide-content" id="s-30">
+      <h2>Starting Real Conversations</h2>
+      <div class="card-row">
+        <div class="info-card" style="border-top-color:var(--teal)">
+          <h4>Beyond "How Are You?"</h4>
+          <p>"How's everything going so far?"<br><br>"Is there anything I can help with — even something small?"<br><br>"How are you finding things here so far?"</p>
+        </div>
+        <div class="info-card" style="border-top-color:var(--mint)">
+          <h4>Encouraging Quiet Students</h4>
+          <p>Ask open questions, not yes/no ones.<br><br>Pause after asking — silence while thinking is OK.<br><br>"What do you think?" — then wait.</p>
+        </div>
+      </div>
+      <div class="key-card"><h3>Feeling unwell?</h3><p>"Would you like the address for the Health Center or a nearby clinic?"</p></div>
+    </div>
+
+    <div class="slide slide-activity-prompt" id="s-31">
+      <div class="ap-icon">📝</div>
+      <div class="ap-part">Part 5 · Supporting Students</div>
+      <div class="ap-heading">Activity 7</div>
+      <div class="ap-label">Translation Apps</div>
+      <div class="ap-instruction">Tap <strong>📝 Activities</strong> in the top bar,<br>then open <strong>Activity 7</strong></div>
+      <button class="btn-go-activities" onclick="goActivities()">Open Activities →</button>
+    </div>
+
+    <!-- s-24: Written divider -->
+    <div class="slide slide-divider" id="s-32">
+      <div class="part-label">Part 6</div>
+      <h2>Written Communication with International Students</h2>
+      <p>Email and written notices are often the first point of contact. The same principles apply — and written mistakes are harder to take back.</p>
+    </div>
+
+    <!-- s-25: Written principles -->
+    <div class="slide slide-content" id="s-33">
+      <h2>Key Principles for Written English</h2>
+      <div class="card-row">
+        <div class="info-card"><div class="ic-icon">✂️</div><h4>Keep it Short</h4><p>One idea per sentence. Two to three sentences per paragraph. Avoid long formal blocks of text.</p></div>
+        <div class="info-card"><div class="ic-icon">📋</div><h4>Use Structure</h4><p>Number steps. Use bullet points for lists. Put the most important information first — not last.</p></div>
+        <div class="info-card"><div class="ic-icon">🤝</div><h4>Stay Warm</h4><p>Open with something supportive. Close with an offer to help. Formal emails can still have a human tone.</p></div>
+      </div>
+    </div>
+
+    <!-- s-26: Email before/after -->
+    <div class="slide slide-content" id="s-34">
+      <h2>Email: Before &amp; After</h2>
+      <div class="ba-row">
+        <div class="ba-box before"><span class="ba-tag">Before</span><p>"Regarding your inquiry, please be advised that the aforementioned documentation is required to be submitted prior to the commencement of the processing period."</p></div>
+        <div class="ba-box after"><span class="ba-tag">After</span><p>"Thank you for your message. Please submit your documents before June 30th. If you have any questions, please feel free to contact us."</p></div>
+      </div>
+      <div class="soft-table">
+        <div class="soft-row"><div class="soft-lbl">Opening</div><div class="soft-ex">"Thank you for your message." / "I hope this email finds you well."</div></div>
+        <div class="soft-row"><div class="soft-lbl">Saying No</div><div class="soft-ex">"I'm afraid we are unable to..." / "Unfortunately..., however..."</div></div>
+        <div class="soft-row"><div class="soft-lbl">Closing</div><div class="soft-ex">"Please do not hesitate to contact us." / "Best regards,"</div></div>
+      </div>
+    </div>
+
+    <div class="slide slide-activity-prompt" id="s-35">
+      <div class="ap-icon">📝</div>
+      <div class="ap-part">Part 6 · Written Communication</div>
+      <div class="ap-heading">Activity 8</div>
+      <div class="ap-label">Plain English Rewrite</div>
+      <div class="ap-instruction">Tap <strong>📝 Activities</strong> in the top bar,<br>then open <strong>Activity 8</strong></div>
+      <button class="btn-go-activities" onclick="goActivities()">Open Activities →</button>
+    </div>
+
+    <!-- s-28: Quick Reference -->
+    <div class="slide slide-content" id="s-36">
+      <h2>Quick Reference: Key Phrases</h2>
+      <div class="ref-grid">
+        <div class="ref-card"><div class="ref-head teal">Opening</div><ul><li>How can I help you today?</li><li>Could I have your student ID?</li><li>What is this regarding?</li></ul></div>
+        <div class="ref-card"><div class="ref-head navy">Clarifying</div><ul><li>Could you say that again?</li><li>Do you mean...?</li><li>Let me make sure I understand.</li></ul></div>
+        <div class="ref-card"><div class="ref-head teal">Explaining Steps</div><ul><li>First..., then..., finally...</li><li>It takes three business days.</li><li>I'll write that down for you.</li></ul></div>
+        <div class="ref-card"><div class="ref-head navy">Saying No Softly</div><ul><li>I'm afraid that isn't possible.</li><li>Unfortunately..., however...</li><li>Let me check what I can do.</li></ul></div>
+        <div class="ref-card"><div class="ref-head teal">Checking In</div><ul><li>Does that make sense?</li><li>Is that OK?</li><li>Would you like me to show you?</li></ul></div>
+        <div class="ref-card"><div class="ref-head navy">Closing</div><ul><li>Is there anything else?</li><li>Please don't hesitate to ask.</li><li>Good luck with your studies!</li></ul></div>
+      </div>
+    </div>
+
+
+    <!-- References slide -->
+    <div class="slide slide-content" id="s-37">
+      <h2>References</h2>
+      <div class="soft-table">
+        <div class="soft-row">
+          <div class="soft-lbl" style="width:90px;font-size:0.7rem">EF (2024)</div>
+          <div class="soft-ex" style="font-style:normal;font-size:0.78rem">EF Education First. (2024). <em>EF English Proficiency Index 2024</em>. EF Education First. https://www.ef.com/epi</div>
+        </div>
+        <div class="soft-row">
+          <div class="soft-lbl" style="width:90px;font-size:0.7rem">JASSO (2024)</div>
+          <div class="soft-ex" style="font-style:normal;font-size:0.78rem">Japan Student Services Organization. (2024). <em>Result of international student survey in Japan, 2024</em>. https://www.studyinjapan.go.jp</div>
+        </div>
+        <div class="soft-row">
+          <div class="soft-lbl" style="width:90px;font-size:0.7rem">ISA (2025)</div>
+          <div class="soft-ex" style="font-style:normal;font-size:0.78rem">Japan Immigration Services Agency. (2025). <em>International student statistics, June 2025</em>. Government of Japan.</div>
+        </div>
+        <div class="soft-row">
+          <div class="soft-lbl" style="width:90px;font-size:0.7rem">Lee (2017)</div>
+          <div class="soft-ex" style="font-style:normal;font-size:0.78rem">Lee, J. S. (2017). Challenges of international students in a Japanese university: Ethnographic perspectives. <em>Journal of International Students, 7</em>(1), 73–93. https://doi.org/10.32674/jis.v7i1.246</div>
+        </div>
+        <div class="soft-row">
+          <div class="soft-lbl" style="width:90px;font-size:0.7rem">Rees (2024)</div>
+          <div class="soft-ex" style="font-style:normal;font-size:0.78rem">Rees, N. (2024). Understanding international student experiences in Japanese higher education: Belonging as an indicator of internationalisation success. <em>London Review of Education, 22</em>(1), Article 27. https://doi.org/10.14324/LRE.22.1.27</div>
+        </div>
+      </div>
+      <div class="key-card" style="margin-top:0.5rem">
+        <h3>Open Access</h3>
+        <p>Both Rees (2024) and Lee (2017) are freely available online. The JASSO and EF data are publicly published annual reports. All sources were verified in 2026.</p>
+      </div>
+    </div>
+
+    <!-- s-29: Key Takeaways -->
+    <div class="slide slide-content" id="s-38">
+      <h2>Key Takeaways</h2>
+      <div class="gap-list">
+        <div class="gap-item"><div class="gap-num" style="background:var(--mint);color:var(--navy)">1</div><div class="gap-body"><strong>You do not need perfect English — you need clear, kind English.</strong></div></div>
+        <div class="gap-item"><div class="gap-num" style="background:var(--mint);color:var(--navy)">2</div><div class="gap-body"><strong>Slow down, check for understanding, and never just repeat louder.</strong></div></div>
+        <div class="gap-item"><div class="gap-num" style="background:var(--mint);color:var(--navy)">3</div><div class="gap-body"><strong>Soft language — I'm afraid / Unfortunately / Let me check — protects relationships.</strong></div></div>
+        <div class="gap-item"><div class="gap-num" style="background:var(--mint);color:var(--navy)">4</div><div class="gap-body"><strong>Always offer an alternative. A "no" with a path forward beats a dead end.</strong></div></div>
+        <div class="gap-item"><div class="gap-num" style="background:var(--mint);color:var(--navy)">5</div><div class="gap-body"><strong>Every interaction is a chance to represent Science Tokyo's international spirit.</strong></div></div>
+      </div>
+    </div>
+
+    <div class="slide slide-activity-prompt" id="s-39">
+      <div class="ap-icon">📝</div>
+      <div class="ap-part">Final Quiz</div>
+      <div class="ap-heading">Activity Quiz</div>
+      <div class="ap-label">8 Questions — All Sections</div>
+      <div class="ap-instruction">Tap <strong>📝 Activities</strong> in the top bar,<br>then open <strong>Activity Quiz</strong></div>
+      <button class="btn-go-activities" onclick="goActivities()">Open Activities →</button>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         ACTIVITIES SLIDE  s-24
+    ═══════════════════════════════════════ -->
+    <div class="slide slide-activities" id="s-40">
+      <h2>📝 Activities &amp; Quiz</h2>
+      <p class="activities-sub">Tap any activity to expand it. Complete them as your instructor guides you through each section.</p>
+      <button class="btn-return" id="btn-return" onclick="returnToLesson()">← Return to Lesson</button>
+
+      <!-- Part 1: Cultural Context -->
+      <div class="act-group">
+        <div class="act-group-header">
+          <span>Part 1 · Cultural Context</span>
+          <span class="part-tag">Activities 1–2</span>
+        </div>
+
+        <div class="act-card" id="card-a1">
+          <div class="act-card-header" onclick="toggleAct('a1')">
+            <div class="act-status" id="status-a1">1</div>
+            <div class="act-info">
+              <div class="act-title">Activity 1 — Cultural Communication Styles</div>
+              <div class="act-desc">A student speaks loudly and seems very direct...</div>
+            </div>
+            <span class="act-type mc">MC</span>
+            <span class="act-chevron">›</span>
+          </div>
+          <div class="act-body" id="body-a1">
+            <span class="ex-type-tag">Multiple Choice</span>
+            <p class="ex-q">A student speaks loudly and seems very direct when asking for help. How should you interpret this?</p>
+            <div class="mc-opts">
+              <div class="mc-opt" onclick="mc(this,'wrong','fb-a1','status-a1')"><div class="mc-letter">A</div><span>They are being rude and should be reminded to speak more quietly.</span></div>
+              <div class="mc-opt" onclick="mc(this,'correct','fb-a1','status-a1')"><div class="mc-letter">B</div><span>This is likely a normal communication style in their culture — respond warmly and focus on helping them.</span></div>
+              <div class="mc-opt" onclick="mc(this,'wrong','fb-a1','status-a1')"><div class="mc-letter">C</div><span>They are frustrated with Science Tokyo and should be directed to the complaints office.</span></div>
+            </div>
+            <div class="mc-fb good" id="fb-a1-good">✓ Correct. Direct, expressive communication is normal in many cultures. Meet energy with warmth.</div>
+            <div class="mc-fb bad" id="fb-a1-bad">Consider the cultural context — what reads as "loud" in Japan is often simply a normal communication style elsewhere.</div>
+          </div>
+        </div>
+
+        <div class="act-card" id="card-a2">
+          <div class="act-card-header" onclick="toggleAct('a2')">
+            <div class="act-status" id="status-a2">2</div>
+            <div class="act-info">
+              <div class="act-title">Activity 2 — Indirect Refusals</div>
+              <div class="act-desc">You say "That might be a little difficult..." The student returns expecting it done.</div>
+            </div>
+            <span class="act-type reveal">Reveal</span>
+            <span class="act-chevron">›</span>
+          </div>
+          <div class="act-body" id="body-a2">
+            <span class="ex-type-tag">Click to Reveal</span>
+            <p class="ex-q">You say "That might be a little difficult to arrange." The student comes back the next day expecting it done. Why?</p>
+            <p class="ex-stem">Think about what went wrong — then reveal the explanation.</p>
+            <div class="reveal-btn" onclick="revealAct(this,'status-a2')">👆 Tap to reveal</div>
+            <div class="reveal-ans">The student interpreted "that might be a little difficult" as "it's possible but needs time." In Japan this means "no."<br><br><strong>Next time:</strong> "I'm afraid that isn't possible, but here is what I can do for you..."<p class="reveal-note">Indirect refusals cause confusion. A clear, warm "no" with an alternative is always better.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 2: Communication Gaps -->
+      <div class="act-group">
+        <div class="act-group-header">
+          <span>Part 2 · Communication Gaps</span>
+          <span class="part-tag">Activities 3–4</span>
+        </div>
+
+        <div class="act-card" id="card-a3">
+          <div class="act-card-header" onclick="toggleAct('a3')">
+            <div class="act-status" id="status-a3">3</div>
+            <div class="act-info">
+              <div class="act-title">Activity 3 — Checking Understanding</div>
+              <div class="act-desc">A student looks confused after you explain the process...</div>
+            </div>
+            <span class="act-type mc">MC</span>
+            <span class="act-chevron">›</span>
+          </div>
+          <div class="act-body" id="body-a3">
+            <span class="ex-type-tag">Multiple Choice</span>
+            <p class="ex-q">A student looks confused after you explain the process. What is the best response?</p>
+            <div class="mc-opts">
+              <div class="mc-opt" onclick="mc(this,'wrong','fb-a3','status-a3')"><div class="mc-letter">A</div><span>Repeat the same explanation more slowly.</span></div>
+              <div class="mc-opt" onclick="mc(this,'correct','fb-a3','status-a3')"><div class="mc-letter">B</div><span>"Does that make sense? I can write the steps down for you."</span></div>
+              <div class="mc-opt" onclick="mc(this,'wrong','fb-a3','status-a3')"><div class="mc-letter">C</div><span>"You need to follow the instructions on the website."</span></div>
+            </div>
+            <div class="mc-fb good" id="fb-a3-good">✓ Exactly right. Checking in and offering to write it down shows both clarity and care.</div>
+            <div class="mc-fb bad" id="fb-a3-bad">Repeating the same words rarely helps — rephrase or offer a visual alternative instead.</div>
+          </div>
+        </div>
+
+        <div class="act-card" id="card-a4">
+          <div class="act-card-header" onclick="toggleAct('a4')">
+            <div class="act-status" id="status-a4">4</div>
+            <div class="act-info">
+              <div class="act-title">Activity 4 — Responding to Broken English</div>
+              <div class="act-desc">A student says: "I don't understand... the form... where?"</div>
+            </div>
+            <span class="act-type reveal">Reveal</span>
+            <span class="act-chevron">›</span>
+          </div>
+          <div class="act-body" id="body-a4">
+            <span class="ex-type-tag">Click to Reveal</span>
+            <p class="ex-q">A student says: "I don't understand... the form... where?"</p>
+            <p class="ex-stem">Think of a clear, friendly, supportive response — then reveal a model answer.</p>
+            <div class="reveal-btn" onclick="revealAct(this,'status-a4')">👆 Tap to reveal</div>
+            <div class="reveal-ans">"Of course! Let me show you." Then point to or draw a simple diagram: "This form — here. Fill in your name here. Bring it back to me."<p class="reveal-note">Action + gesture often communicates more than words alone.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 3: Counter Language -->
+      <div class="act-group">
+        <div class="act-group-header">
+          <span>Part 3 · Counter Language</span>
+          <span class="part-tag">Activity 5</span>
+        </div>
+
+        <div class="act-card" id="card-a5">
+          <div class="act-card-header" onclick="toggleAct('a5')">
+            <div class="act-status" id="status-a5">5</div>
+            <div class="act-info">
+              <div class="act-title">Activity 5 — At the Counter</div>
+              <div class="act-desc">A student asks about a form but you are not sure which one...</div>
+            </div>
+            <span class="act-type mc">MC</span>
+            <span class="act-chevron">›</span>
+          </div>
+          <div class="act-body" id="body-a5">
+            <span class="ex-type-tag">Multiple Choice</span>
+            <p class="ex-q">A student asks about a form but you are not sure which one. What do you say?</p>
+            <div class="mc-opts">
+              <div class="mc-opt" onclick="mc(this,'wrong','fb-a5','status-a5')"><div class="mc-letter">A</div><span>"You need to check the website for the right form."</span></div>
+              <div class="mc-opt" onclick="mc(this,'wrong','fb-a5','status-a5')"><div class="mc-letter">B</div><span>"I don't know — try the main office."</span></div>
+              <div class="mc-opt" onclick="mc(this,'correct','fb-a5','status-a5')"><div class="mc-letter">C</div><span>"Let me check that for you — just one moment."</span></div>
+            </div>
+            <div class="mc-fb good" id="fb-a5-good">✓ Great. "Let me check" keeps the interaction open and supportive.</div>
+            <div class="mc-fb bad" id="fb-a5-bad">Even if you don't know, "let me check" keeps the door open. Never send a student away without trying.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 4: Rules & Requests -->
+      <div class="act-group">
+        <div class="act-group-header">
+          <span>Part 4 · Rules &amp; Requests</span>
+          <span class="part-tag">Activity 6</span>
+        </div>
+
+        <div class="act-card" id="card-a6">
+          <div class="act-card-header" onclick="toggleAct('a6')">
+            <div class="act-status" id="status-a6">6</div>
+            <div class="act-info">
+              <div class="act-title">Activity 6 — Saying No Softly</div>
+              <div class="act-desc">A student asks to borrow equipment without a reservation...</div>
+            </div>
+            <span class="act-type mc">MC</span>
+            <span class="act-chevron">›</span>
+          </div>
+          <div class="act-body" id="body-a6">
+            <span class="ex-type-tag">Multiple Choice</span>
+            <p class="ex-q">A student asks to borrow equipment without a reservation. Which is the best response?</p>
+            <div class="mc-opts">
+              <div class="mc-opt" onclick="mc(this,'wrong','fb-a6','status-a6')"><div class="mc-letter">A</div><span>"No, you need a reservation. Come back when you have one."</span></div>
+              <div class="mc-opt" onclick="mc(this,'correct','fb-a6','status-a6')"><div class="mc-letter">B</div><span>"I'm afraid equipment needs to be reserved in advance. Let me check if anything is available today."</span></div>
+              <div class="mc-opt" onclick="mc(this,'wrong','fb-a6','status-a6')"><div class="mc-letter">C</div><span>"That is not possible without a booking."</span></div>
+            </div>
+            <div class="mc-fb good" id="fb-a6-good">✓ Perfect use of the CARE formula — soft refusal, then an immediate offer to help.</div>
+            <div class="mc-fb bad" id="fb-a6-bad">This closes the interaction. Even when the answer is no, always try to offer a next step.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 5: Supporting Students -->
+      <div class="act-group">
+        <div class="act-group-header">
+          <span>Part 5 · Supporting Students</span>
+          <span class="part-tag">Activity 7</span>
+        </div>
+
+        <div class="act-card" id="card-a7">
+          <div class="act-card-header" onclick="toggleAct('a7')">
+            <div class="act-status" id="status-a7">7</div>
+            <div class="act-info">
+              <div class="act-title">Activity 7 — Translation Apps</div>
+              <div class="act-desc">A student shows you their phone with a Japanese translation...</div>
+            </div>
+            <span class="act-type mc">MC</span>
+            <span class="act-chevron">›</span>
+          </div>
+          <div class="act-body" id="body-a7">
+            <span class="ex-type-tag">Multiple Choice</span>
+            <p class="ex-q">A student shows you their phone with a Japanese translation of their question. What do you do?</p>
+            <div class="mc-opts">
+              <div class="mc-opt" onclick="mc(this,'wrong','fb-a7','status-a7')"><div class="mc-letter">A</div><span>Ask them to put the phone away and speak in English.</span></div>
+              <div class="mc-opt" onclick="mc(this,'wrong','fb-a7','status-a7')"><div class="mc-letter">B</div><span>Ignore the phone and continue explaining verbally.</span></div>
+              <div class="mc-opt" onclick="mc(this,'correct','fb-a7','status-a7')"><div class="mc-letter">C</div><span>Say "Of course — please go ahead" and read their screen, then respond in simple English.</span></div>
+            </div>
+            <div class="mc-fb good" id="fb-a7-good">✓ Exactly right. Welcoming translation tools removes pressure and shows genuine support.</div>
+            <div class="mc-fb bad" id="fb-a7-bad">Translation tools are your ally — welcoming them shows respect and removes pressure from the student.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 6: Written Communication -->
+      <div class="act-group">
+        <div class="act-group-header">
+          <span>Part 6 · Written Communication</span>
+          <span class="part-tag">Activity 8</span>
+        </div>
+
+        <div class="act-card" id="card-a8">
+          <div class="act-card-header" onclick="toggleAct('a8')">
+            <div class="act-status" id="status-a8">8</div>
+            <div class="act-info">
+              <div class="act-title">Activity 8 — Plain English Rewrite</div>
+              <div class="act-desc">Rewrite a bureaucratic sentence in plain, clear English.</div>
+            </div>
+            <span class="act-type reveal">Reveal</span>
+            <span class="act-chevron">›</span>
+          </div>
+          <div class="act-body" id="body-a8">
+            <span class="ex-type-tag">Click to Reveal</span>
+            <p class="ex-q">Rewrite this in plain English:</p>
+            <p class="ex-stem">"The submission of the requisite documentation must be completed prior to the expiration of the designated deadline."</p>
+            <div class="reveal-btn" onclick="revealAct(this,'status-a8')">👆 Tap to reveal</div>
+            <div class="reveal-ans">"Please submit your documents before the deadline."<p class="reveal-note">7 words instead of 19 — and far easier for a non-native reader to understand.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final Quiz -->
+      <div class="act-group">
+        <div class="act-group-header" style="background:var(--mint);color:var(--navy)">
+          <span>Final Quiz</span>
+          <span class="part-tag" style="color:var(--navy)">8 Questions</span>
+        </div>
+
+        <div class="act-card" id="card-quiz">
+          <div class="act-card-header" onclick="toggleAct('quiz')">
+            <div class="act-status" id="status-quiz">🎯</div>
+            <div class="act-info">
+              <div class="act-title">Final Quiz — All Sections</div>
+              <div class="act-desc">8 questions covering everything from today's session.</div>
+            </div>
+            <span class="act-type quiz">Quiz</span>
+            <span class="act-chevron">›</span>
+          </div>
+          <div class="act-body" id="body-quiz">
+            <div class="quiz-q"><div class="quiz-qn">Question 1 of 8</div><h4>A student is silent after you explain the visa process. What should you do?</h4><div class="mc-opts"><div class="mc-opt" onclick="qa(this,0,false)"><div class="mc-letter">A</div><span>Wait for them to speak — do not interrupt.</span></div><div class="mc-opt" onclick="qa(this,0,true)"><div class="mc-letter">B</div><span>"Does that make sense? I can write the steps down if you'd like."</span></div><div class="mc-opt" onclick="qa(this,0,false)"><div class="mc-letter">C</div><span>Repeat the explanation again from the beginning.</span></div></div></div>
+            <div class="quiz-q"><div class="quiz-qn">Question 2 of 8</div><h4>Which phrase best opens a counter interaction?</h4><div class="mc-opts"><div class="mc-opt" onclick="qa(this,1,false)"><div class="mc-letter">A</div><span>"What do you want?"</span></div><div class="mc-opt" onclick="qa(this,1,false)"><div class="mc-letter">B</div><span>"Can I help?"</span></div><div class="mc-opt" onclick="qa(this,1,true)"><div class="mc-letter">C</div><span>"How can I help you today?"</span></div></div></div>
+            <div class="quiz-q"><div class="quiz-qn">Question 3 of 8</div><h4>A student asks for something not possible. Which uses CARE correctly?</h4><div class="mc-opts"><div class="mc-opt" onclick="qa(this,2,false)"><div class="mc-letter">A</div><span>"That is not possible. Come back next week."</span></div><div class="mc-opt" onclick="qa(this,2,true)"><div class="mc-letter">B</div><span>"I understand. Unfortunately that isn't available today, but I can check what alternatives we have."</span></div><div class="mc-opt" onclick="qa(this,2,false)"><div class="mc-letter">C</div><span>"I'm sorry, there is nothing I can do."</span></div></div></div>
+            <div class="quiz-q"><div class="quiz-qn">Question 4 of 8</div><h4>A student says "yes" to all your questions but still looks confused. Why?</h4><div class="mc-opts"><div class="mc-opt" onclick="qa(this,3,false)"><div class="mc-letter">A</div><span>They understood everything but are shy.</span></div><div class="mc-opt" onclick="qa(this,3,true)"><div class="mc-letter">B</div><span>They may be saying "yes" out of politeness, not because they understood.</span></div><div class="mc-opt" onclick="qa(this,3,false)"><div class="mc-letter">C</div><span>They are not interested in what you are saying.</span></div></div></div>
+            <div class="quiz-q"><div class="quiz-qn">Question 5 of 8</div><h4>A student says: "My visa... letter... today possible?"</h4><p class="quiz-stem">Which response is Clear, Friendly, and Supportive?</p><div class="mc-opts"><div class="mc-opt" onclick="qa(this,4,false)"><div class="mc-letter">A</div><span>"We cannot issue letters same-day. Fill the form and return in three business days."</span></div><div class="mc-opt" onclick="qa(this,4,false)"><div class="mc-letter">B</div><span>"A letter? Come back tomorrow."</span></div><div class="mc-opt" onclick="qa(this,4,true)"><div class="mc-letter">C</div><span>"Of course — I can help. An official letter takes three days, but I can give you something today showing you are enrolled. Would that help?"</span></div></div></div>
+            <div class="quiz-q"><div class="quiz-qn">Question 6 of 8</div><h4>Which best demonstrates the CARE formula?</h4><div class="mc-opts"><div class="mc-opt" onclick="qa(this,5,false)"><div class="mc-letter">A</div><span>"I cannot help you. Please speak to another office."</span></div><div class="mc-opt" onclick="qa(this,5,false)"><div class="mc-letter">B</div><span>"I understand, but the rules are the rules."</span></div><div class="mc-opt" onclick="qa(this,5,true)"><div class="mc-letter">C</div><span>"I completely understand. Unfortunately that isn't possible today, but let me check what I can arrange."</span></div></div></div>
+            <div class="quiz-q"><div class="quiz-qn">Question 7 of 8</div><h4>A student emails asking why their application was rejected. Which opening is best?</h4><div class="mc-opts"><div class="mc-opt" onclick="qa(this,6,false)"><div class="mc-letter">A</div><span>"Dear Student, Your application was rejected because..."</span></div><div class="mc-opt" onclick="qa(this,6,true)"><div class="mc-letter">B</div><span>"Dear [Name], Thank you for your message. I am sorry to hear your application was not successful. Here is what happened..."</span></div><div class="mc-opt" onclick="qa(this,6,false)"><div class="mc-letter">C</div><span>"Hi, We cannot discuss application decisions by email."</span></div></div></div>
+            <div class="quiz-q"><div class="quiz-qn">Question 8 of 8</div><h4>A student from another country raises their voice slightly. What is the most likely explanation?</h4><div class="mc-opts"><div class="mc-opt" onclick="qa(this,7,false)"><div class="mc-letter">A</div><span>They are being deliberately rude.</span></div><div class="mc-opt" onclick="qa(this,7,false)"><div class="mc-letter">B</div><span>They do not respect Science Tokyo's staff.</span></div><div class="mc-opt" onclick="qa(this,7,true)"><div class="mc-letter">C</div><span>This may be a normal communication style in their culture — respond with warmth and focus on solving their problem.</span></div></div></div>
+            <button class="btn-submit" id="quiz-sub" onclick="submitQuiz()" disabled>See My Score →</button>
+            <div class="quiz-result" id="quiz-res">
+              <div class="q-score" id="q-score"></div>
+              <div class="q-msg" id="q-msg"></div>
+              <div class="q-sub" id="q-sub"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end activities slide -->
+
+  <!-- FOOTER NAV -->
+  <div class="slide-footer">
+    <button class="btn-slide btn-prev" id="btn-prev" onclick="nav(-1)" disabled>← Back</button>
+    <div style="text-align:center">
+      <div class="slide-counter" id="slide-counter">Slide 1 of 24</div>
+    </div>
+    <button class="btn-slide btn-nxt" id="btn-next" onclick="nav(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+
+  // ── CONFIG ────────────────────────────────────────
+  const CONTENT_SLIDES = 37; // s-0 to s-23
+  const ACTIVITIES_ID  = 40; // s-24
+
+  const SLIDE_NAMES = [
+    "Title",
+    "About Your Instructor",
+    "Session Outline",
+    "Japan's International Student Boom",
+    "The Communication Gap",
+    "Why Belonging Matters",
+    "Why This Matters",
+    "What Good Communication Looks Like",
+    "Understanding the Cultural Context",
+    "Different Communication Cultures",
+    "Common Cultural Friction Points",
+    "Gestures Aren't Universal Either",
+    "Activity 1 and 2",
+    "Common Communication Gaps",
+    "The Top 5 Gaps",
+    "Before and After",
+    "\"Yes\" Doesn't Always Mean Yes",
+    "Activity 3 and 4",
+    "Counter and Procedure Language",
+    "Essential Phrases",
+    "Dialogue: Certificate Request",
+    "Dialogue: Lost on Campus",
+    "Activity 5",
+    "Rules, Requests and Saying No Softly",
+    "The Softening Toolkit",
+    "CARE Formula in Action",
+    "Activity 6",
+    "Supporting Students Who Struggle",
+    "Reading the Signs",
+    "Rephrasing Without Repeating",
+    "Starting Real Conversations",
+    "Activity 7",
+    "Written Communication",
+    "Key Principles for Written English",
+    "Email Before and After",
+    "Activity 8",
+    "Quick Reference: Key Phrases",
+    "References",
+    "Key Takeaways",
+    "Activity Quiz"
+  ];
+
+  let cur = 0;
+  let lastLesson = 0; // remembers last content slide before going to activities
+
+  // ── NAVIGATION ────────────────────────────────────
+  function nav(dir) {
+    const next = cur + dir;
+    if (next < 0 || next > ACTIVITIES_ID) return;
+    showSlide(next);
+  }
+
+  function goActivities() {
+    if (cur !== ACTIVITIES_ID) lastLesson = cur;
+    showSlide(ACTIVITIES_ID);
+  }
+
+  function returnToLesson() {
+    showSlide(lastLesson);
+  }
+
+  function showSlide(n) {
+    document.getElementById('s-' + cur).classList.remove('active');
+    cur = n;
+    document.getElementById('s-' + cur).classList.add('active');
+    document.getElementById('s-' + cur).scrollTop = 0;
+    updateNav();
+  }
+
+  function updateNav() {
+    const isActivities = cur === ACTIVITIES_ID;
+    document.getElementById('btn-prev').disabled = cur === 0;
+    document.getElementById('btn-next').disabled = cur === ACTIVITIES_ID;
+    const total = ACTIVITIES_ID; // content slides only in counter
+    const display = isActivities ? 'Activities' : 'Slide ' + (cur + 1) + ' of ' + total;
+    document.getElementById('slide-counter').textContent = display;
+    document.getElementById('prog-lbl').textContent = isActivities ? '📝' : (cur + 1) + '/' + total;
+    document.getElementById('prog-fill').style.width = isActivities ? '100%' : ((cur + 1) / total * 100) + '%';
+    // Update return button text
+    if (lastLesson >= 0 && lastLesson < ACTIVITIES_ID) {
+      document.getElementById('btn-return').textContent = '← Return to Slide ' + (lastLesson + 1) + ': ' + SLIDE_NAMES[lastLesson];
+    }
+  }
+
+  // ── ACTIVITY ACCORDION ────────────────────────────
+  function toggleAct(id) {
+    const card = document.getElementById('card-' + id);
+    const body = document.getElementById('body-' + id);
+    const isOpen = card.classList.contains('open');
+    // Close all others
+    document.querySelectorAll('.act-card').forEach(c => c.classList.remove('open'));
+    if (!isOpen) card.classList.add('open');
+  }
+
+  // ── MC EXERCISES ──────────────────────────────────
+  function mc(el, result, fbId, statusId) {
+    if (el.classList.contains('done')) return;
+    const parent = el.closest('.mc-opts');
+    parent.querySelectorAll('.mc-opt').forEach(o => o.classList.add('done'));
+    el.classList.add(result);
+    if (result === 'correct') {
+      const fb = document.getElementById(fbId + '-good');
+      if (fb) fb.classList.add('show');
+      markDone(statusId);
+    } else {
+      const fb = document.getElementById(fbId + '-bad');
+      if (fb) fb.classList.add('show');
+      parent.querySelectorAll('.mc-opt').forEach(o => {
+        if ((o.getAttribute('onclick')||'').includes("'correct'")) o.classList.add('correct');
+      });
+      markDone(statusId);
+    }
+  }
+
+  function revealAct(el, statusId) {
+    el.style.display = 'none';
+    el.nextElementSibling.classList.add('show');
+    markDone(statusId);
+  }
+
+  function markDone(statusId) {
+    const s = document.getElementById(statusId);
+    if (s) { s.textContent = '✓'; s.classList.add('done'); }
+  }
+
+  // ── QUIZ ──────────────────────────────────────────
+  const qA = new Array(8).fill(null);
+
+  function qa(el, idx, correct) {
+    if (el.classList.contains('done')) return;
+    const parent = el.closest('.quiz-q');
+    parent.querySelectorAll('.mc-opt').forEach(o => o.classList.add('done'));
+    el.classList.add(correct ? 'correct' : 'wrong');
+    if (!correct) {
+      parent.querySelectorAll('.mc-opt').forEach(o => {
+        if ((o.getAttribute('onclick')||'').includes('true')) o.classList.add('correct');
+      });
+    }
+    qA[idx] = correct;
+    if (qA.every(a => a !== null)) document.getElementById('quiz-sub').disabled = false;
+  }
+
+  function submitQuiz() {
+    const score = qA.filter(Boolean).length;
+    const res = document.getElementById('quiz-res');
+    document.getElementById('q-score').textContent = score + ' / 8';
+    res.classList.remove('ex','gd','kg');
+    if (score >= 7) {
+      res.classList.add('ex');
+      document.getElementById('q-msg').textContent = 'Outstanding! 🎉';
+      document.getElementById('q-sub').textContent = "You have a strong grasp of supportive English communication. Science Tokyo's international students are in good hands.";
+    } else if (score >= 5) {
+      res.classList.add('gd');
+      document.getElementById('q-msg').textContent = 'Good work! 👍';
+      document.getElementById('q-sub').textContent = 'A solid result. Review the Quick Reference card and keep practising the phrases you found tricky.';
+    } else {
+      res.classList.add('kg');
+      document.getElementById('q-msg').textContent = 'Keep going! 💪';
+      document.getElementById('q-sub').textContent = 'Revisit the softening language and CARE formula sections — and bookmark the Quick Reference card.';
+    }
+    res.classList.add('show');
+    document.getElementById('quiz-sub').disabled = true;
+    markDone('status-quiz');
+    res.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // Init
+  updateNav();
+
+</script>
+</body>
+</html>
